@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rent Price Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h2>Apartment Rent Price Prediction</h2>
+        <form method="POST">
+            <label>BHK (number of bedrooms, hall, kitchen):</label>
+            <input type="number" name="BHK" min="1" required><br>
+
+            <label>Size (in square feet):</label>
+            <input type="number" name="Size" min="1" required><br>
+
+            <label>Floor (e.g. "5 out of 10", "Ground out of 5"):</label>
+            <input type="text" name="Floor" required><br>
+
+            <label>Number of bathrooms:</label>
+            <input type="number" name="Bathroom" min="1" required><br>
+
+            <label>Area Locality:</label>
+            <input type="text" name="Area_Locality" required><br>
+
+            <label>City:</label>
+            <select name="City" required>
+                <option value="Bangalore">Bangalore</option>
+                <option value="Chennai">Chennai</option>
+                <option value="Delhi">Delhi</option>
+                <option value="Hyderabad">Hyderabad</option>
+                <option value="Kolkata">Kolkata</option>
+                <option value="Mumbai">Mumbai</option>
+            </select><br>
+
+            <label>Furnishing Status:</label>
+            <select name="Furnishing_Status" required>
+                <option value="Furnished">Furnished</option>
+                <option value="Semi-Furnished">Semi-Furnished</option>
+                <option value="Unfurnished">Unfurnished</option>
+            </select><br>
+
+            <label>Tenant Preferred:</label>
+            <select name="Tenant_Preferred" required>
+                <option value="Bachelors/Family">Bachelors/Family</option>
+                <option value="Bachelors">Bachelors</option>
+                <option value="Family">Family</option>
+            </select><br>
+
+            <label>Area Type:</label>
+            <select name="Area_Type" required>
+                <option value="Super Area">Super Area</option>
+                <option value="Carpet Area">Carpet Area</option>
+                <option value="Built Area">Built Area</option>
+            </select><br>
+
+            <label>Posted On (optional):</label>
+            <input type="date" name="Posted_On"><br>
+
+            <input type="submit" value="Predict">
+        </form>
+        {% if warning %}
+            <div class="warning">
+                <h4>{{ warning }}</h4>
+            </div>
+        {% endif %}
+        {% if prediction %}
+            <div class="result">
+                <h3>Predicted Rent: {{ prediction }}</h3>
+            </div>
+        {% endif %}
+        {% if error %}
+            <div class="error">
+                <h4>{{ error }}</h4>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>

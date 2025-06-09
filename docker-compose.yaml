@@ -1,0 +1,52 @@
+version: "3.8"
+services:
+  train:
+    build: .
+    command: python src/train.py
+    volumes:
+      - ./artifacts:/app/artifacts
+      - ./processed:/app/processed
+      - ./data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on: []
+    restart: "no"
+
+  evaluate:
+    build: .
+    command: python src/evaluate.py
+    volumes:
+      - ./artifacts:/app/artifacts
+      - ./processed:/app/processed
+      - ./data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - train
+    restart: "no"
+
+  test:
+    build: .
+    command: pytest
+    volumes:
+      - ./:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - train
+    restart: "no"
+
+  web:
+    build: .
+    command: python app/app.py
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./:/app
+    environment:
+      - FLASK_ENV=development
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - train
+      - evaluate
+    restart: "unless-stopped"
