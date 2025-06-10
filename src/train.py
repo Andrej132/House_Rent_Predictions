@@ -11,16 +11,20 @@ from logger import get_logger
 
 logger = get_logger('train_model')
 
-def train_model(df, model_path="../models/xgb_model.pkl"):
+MODEL_PATH = "models/xgb_model.pkl"
+PROCESSED_DATA_PATH = "data/processed"
+RAW_DATA_PATH = "data/raw/House_Rent_Dataset.csv"
+
+def train_model(df, model_path=MODEL_PATH):
     X_train, X_test, y_train, y_test, top_areas, median_floor, median_total_floors = split_and_prepare(df)
 
-    if not os.path.exists("../data/processed"):
-        os.makedirs("../data/processed", exist_ok=True)
-    X_train.to_csv("../data/processed/X_train.csv", index=False)
-    X_test.to_csv("../data/processed/X_test.csv", index=False)
-    y_train.to_csv("../data/processed/y_train.csv", index=False)
-    y_test.to_csv("../data/processed/y_test.csv", index=False)
-    logger.info("Processed CSV files saved in processed/")
+    if not os.path.exists(PROCESSED_DATA_PATH):
+        os.makedirs(PROCESSED_DATA_PATH, exist_ok=True)
+    X_train.to_csv(os.path.join(PROCESSED_DATA_PATH, "X_train.csv"), index=False)
+    X_test.to_csv(os.path.join(PROCESSED_DATA_PATH, "X_test.csv"), index=False)
+    y_train.to_csv(os.path.join(PROCESSED_DATA_PATH, "y_train.csv"), index=False)
+    y_test.to_csv(os.path.join(PROCESSED_DATA_PATH, "y_test.csv"), index=False)
+    logger.info("Processed CSV files saved in data/processed/")
 
     categorical_cols = ['Area_Locality_Top', 'City', 'Furnishing Status', 'Tenant Preferred', 'Area Type']
 
@@ -64,7 +68,7 @@ def train_model(df, model_path="../models/xgb_model.pkl"):
 
 if __name__ == "__main__":
     logger.info("Starting training...")
-    df = pd.read_csv("../data/raw/House_Rent_Dataset.csv")
+    df = pd.read_csv(RAW_DATA_PATH)
     train_model(df)
     logger.info("Training finished.")
 

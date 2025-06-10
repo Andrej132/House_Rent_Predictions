@@ -51,7 +51,7 @@ def test_parse_floor():
     assert parse_floor("Ground out of 5") == (0, 5)
     assert parse_floor("7") == (7, np.nan)
     assert parse_floor("Ground") == (0, np.nan)
-    assert parse_floor("nonsense") == (np.nan, np.nan)
+    assert parse_floor("first floor") == (np.nan, np.nan)
 
 def test_feature_engineering_input():
     row = {

@@ -8,6 +8,11 @@ from logger import get_logger
 
 logger = get_logger('evaluate_model')
 
+MODEL_PATH = "models/xgb_model.pkl"
+ARTIFACTS_DIR = "artifacts"
+X_TEST_PATH = "data/processed/X_test.csv"
+Y_TEST_PATH = "data/processed/y_test.csv"
+
 def evaluate_model(model, X_test, y_test):
     y_pred_log = model.predict(X_test)
     y_pred = np.expm1(y_pred_log)
@@ -56,17 +61,17 @@ def plot_feature_importance(model, feature_names, save_path=None, top_n=20):
 
 if __name__ == "__main__":
     logger.info("Loading model...")
-    data = joblib.load("../models/xgb_model.pkl")
+    data = joblib.load(MODEL_PATH)
     model = data["model"]
 
-    X_test = pd.read_csv("../data/processed/X_test.csv")
-    y_test = pd.read_csv("../data/processed/y_test.csv").squeeze()
+    X_test = pd.read_csv(X_TEST_PATH)
+    y_test = pd.read_csv(Y_TEST_PATH).squeeze()
 
     y_true, y_pred = evaluate_model(model, X_test, y_test)
-    if not os.path.exists("../artifacts"):
-        os.makedirs("../artifacts", exist_ok=True)
+    if not os.path.exists(ARTIFACTS_DIR):
+        os.makedirs(ARTIFACTS_DIR, exist_ok=True)
     plot_actual_vs_predicted(
-        y_true, y_pred, save_path="../artifacts/actual_vs_predicted.png"
+        y_true, y_pred, save_path=os.path.join(ARTIFACTS_DIR, "actual_vs_predicted.png")
     )
 
     ohe = model.named_steps['pre'].named_transformers_['cat']
@@ -75,5 +80,5 @@ if __name__ == "__main__":
     num_feature_names = [col for col in X_test.columns if col not in categorical_cols]
     all_feature_names = list(ohe_feature_names) + num_feature_names
     plot_feature_importance(
-        model.named_steps['model'], all_feature_names, save_path="../artifacts/feature_importance.png"
+        model.named_steps['model'], all_feature_names, save_path=os.path.join(ARTIFACTS_DIR, "feature_importance.png")
     )

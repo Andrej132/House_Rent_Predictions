@@ -79,9 +79,7 @@ def index():
                 "Posted On": pd.to_datetime(request.form.get("Posted_On", pd.Timestamp.now())),
             }
             current_floor, total_floors = parse_floor(user_data["Floor"])
-            floor_invalid = False
             if np.isnan(current_floor) or np.isnan(total_floors):
-                floor_invalid = True
                 warning = ("Warning: The format of the Floor field is invalid. "
                            "Typical values will be used instead. The predicted rent may be less accurate!")
             user_data["Current_Floor"] = int(current_floor) if not np.isnan(current_floor) else int(median_floor)
@@ -103,10 +101,10 @@ def index():
             row_df = pd.DataFrame([row])[model_cols]
             pred_log = pipe.predict(row_df)[0]
             pred_rent = np.expm1(pred_log)
-            prediction = f"{pred_rent:,.0f}$"
+            prediction = f"{pred_rent:,.0f}INR"
         except Exception as e:
             error = f"Error in data processing: {str(e)}"
     return render_template("index.html", prediction=prediction, error=error, warning=warning)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000)
