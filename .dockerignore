@@ -1,0 +1,15 @@
+.git
+.gitignore
+.pytest_cache
+.venv
+.vscode
+__pycache__
+**/__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.log
+artifacts
+models
+notebooks
+data/processed

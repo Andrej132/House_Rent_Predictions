@@ -1,12 +1,21 @@
 FROM python:3.12-slim
 
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+ENV PIP_NO_CACHE_DIR=1
+
 WORKDIR /app
+
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
 
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
 COPY . .
 
-ENV PYTHONUNBUFFERED=1
+RUN chown -R appuser:appgroup /app
+USER appuser
 
-CMD ["python", "app/app.py"]
+EXPOSE 5000
+
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app.app:app"]

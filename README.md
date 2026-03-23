@@ -88,31 +88,149 @@ project-root/
 
 ### 1. **Prerequisites**
 
-- [Docker](https://www.docker.com/get-started) and [Docker Compose](https://docs.docker.com/compose/) installed
+- [Docker](https://www.docker.com/get-started) and Docker Compose installed
+- Run all commands from the project root
 
-### 2. **Build and Run All Services**
+### 2. **Build the Image Once**
 
-From the project root, run:
+Build the shared image before running any stage of the pipeline:
+
+```bash
+docker compose build
+```
+
+All services use the same image: training, evaluation, testing, and the web app.
+
+### 3. **Recommended End-to-End Workflow**
+
+If you want to go through the full pipeline in order, use these commands:
+
+#### Step 1: Train the Model
+
+```bash
+docker compose up train
+```
+
+What this does:
+
+- Loads the raw dataset from `data/raw/`
+- Preprocesses the data
+- Saves processed datasets to `data/processed/`
+- Saves the trained model to `models/`
+
+#### Step 2: Evaluate the Model
+
+```bash
+docker compose --profile pipeline up evaluate
+```
+
+What this does:
+
+- Uses the trained model from `models/`
+- Reads test data from `data/processed/`
+- Generates evaluation plots in `artifacts/`
+
+#### Step 3: Run the Tests
+
+```bash
+docker compose --profile test up test
+```
+
+What this does:
+
+- Runs the automated test suite with `pytest`
+- Verifies the Flask app and prediction flow against the trained model
+
+#### Step 4: Start the Web Application
+
+```bash
+docker compose up web
+```
+
+The application will be available at [http://localhost:5000](http://localhost:5000).
+
+To stop the web container:
+
+```bash
+docker compose down
+```
+
+### 4. **Quick Command Reference**
+
+Use these when you only need one stage:
+
+```bash
+docker compose build
+docker compose up train
+docker compose --profile pipeline up evaluate
+docker compose --profile test up test
+docker compose up web
+docker compose down
+```
+
+### 5. **Outputs Created by Each Stage**
+
+- Training creates processed CSV files in `data/processed/`
+- Training creates the saved model in `models/xgb_model.pkl`
+- Evaluation creates plots in `artifacts/`
+- Web uses `models/xgb_model.pkl` to serve predictions
+
+### 6. **One-Command Options**
+
+If you only want to run the app and let Compose handle the required training step automatically:
 
 ```bash
 docker compose up --build
 ```
 
-This will start the following services (in the correct order):
+This starts:
 
-- **train**: Trains the XGBoost model and saves processed data and model artifacts.
-- **evaluate**: Loads the trained model, evaluates it, and generates plots.
-- **test**: Runs all unit/integration tests using pytest.
-- **web**: Launches the Flask web app for user predictions.
+- `train`
+- `web`
 
-The web app will be available at: [http://localhost:5000](http://localhost:5000)
+If you want to run training and evaluation together:
 
-### 3. **Stopping the Project**
+```bash
+docker compose --profile pipeline up --build
+```
 
-To stop all containers:
+This starts:
+
+- `train`
+- `evaluate`
+
+If you want to run training and tests together:
+
+```bash
+docker compose --profile test up --build
+```
+
+This starts:
+
+- `train`
+- `test`
+
+### 7. **Reset Generated Outputs**
+
+If you want a clean run of the pipeline, remove generated outputs first:
 
 ```bash
 docker compose down
+docker compose rm -f
+```
+
+Optionally delete generated local folders if you want to retrain from scratch.
+
+PowerShell:
+
+```powershell
+Remove-Item -Recurse -Force models, artifacts, data/processed
+```
+
+Bash:
+
+```bash
+rm -rf models artifacts data/processed
 ```
 
 ---

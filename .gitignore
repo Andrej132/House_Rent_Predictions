@@ -14,10 +14,6 @@ build/
 dist/
 *.egg-info/
 
-# Generated ML outputs
-models/
-artifacts/
-data/processed/
 
 # Test and tooling caches
 .pytest_cache/
